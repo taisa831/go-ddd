@@ -1,0 +1,33 @@
+version: "3"
+volumes:
+  db-volume:
+services:
+  mysql:
+    image: mysql:5.7.30
+    container_name: sandbox-go
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: sandbox-go
+    ports:
+      - 13306:3306
+    volumes:
+      - db-volume:/var/lib/mysql
+  app:
+    # コンテナ名
+    container_name: sandbox-go
+    build: .
+    volumes:
+      - .:/go/src/github.com/taisa831/sandbox-docker-compose-go
+    ports:
+      - "8081:8081"
+    entrypoint:
+      # mysqlが立ち上がるまで待つ
+      - dockerize
+      - -wait
+      - tcp://mysql:3306
+    command: ["/opt/sandbox-go/app"]
+    restart: always
+    depends_on:
+      - mysql
