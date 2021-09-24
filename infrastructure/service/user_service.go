@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/taisa831/go-ddd/domain/model"
 	"github.com/taisa831/go-ddd/domain/repository"
 	"github.com/taisa831/go-ddd/domain/service"
 )
@@ -16,9 +17,12 @@ func NewUserService(r repository.Repository) service.UserService {
 }
 
 func (s *UserService) Exists(name string) (bool, error) {
-	_, err := s.r.FindUserByName(name)
-	if err != nil {
+	user, err := s.r.FindUserByName(name)
+	if err != nil && err != model.ErrNotFound {
 		return false, err
 	}
-	return true, nil
+	if user != nil {
+		return true, nil
+	}
+	return false, nil
 }

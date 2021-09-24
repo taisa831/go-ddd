@@ -3,10 +3,10 @@ package usecase
 import (
 	"fmt"
 
-	"github.com/taisa831/go-ddd/application/input"
 	"github.com/taisa831/go-ddd/domain/model"
 	"github.com/taisa831/go-ddd/domain/repository"
 	"github.com/taisa831/go-ddd/domain/service"
+	"github.com/taisa831/go-ddd/interfaces/request"
 )
 
 type UserUsecase struct {
@@ -25,17 +25,17 @@ func (u *UserUsecase) Primitive() {
 	fmt.Println(fullName)
 }
 
-func (u *UserUsecase) Create(in input.UserCreateInput) error {
-	b, err := u.us.Exists(in.Name)
+func (u *UserUsecase) Create(req request.UserCreateRequest) error {
+	b, err := u.us.Exists(req.Name)
 	if err != nil {
 		return err
 	}
 	if b {
-		return fmt.Errorf("%s は存在します。", in.Name)
+		return &model.UserExistsError{}
 	}
 
 	conf := model.UserCreateConfig{
-		Name: in.Name,
+		Name: req.Name,
 	}
 	user, err := model.NewUser(conf)
 	if err != nil {

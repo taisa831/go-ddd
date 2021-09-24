@@ -5,12 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type rdbRepository struct {
+type dbRepository struct {
 	db *gorm.DB
 }
 
 func NewRepository(db *gorm.DB) repository.Repository {
-	return &rdbRepository{
+	return &dbRepository{
 		db: db,
 	}
 }

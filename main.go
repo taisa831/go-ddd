@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/taisa831/go-ddd/infrastracture/repository"
-	"github.com/taisa831/go-ddd/infrastracture/service"
+	"github.com/taisa831/go-ddd/domain/model"
+	"github.com/taisa831/go-ddd/infrastructure/repository"
+	"github.com/taisa831/go-ddd/infrastructure/service"
 	"github.com/taisa831/go-ddd/interfaces/handler"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -31,6 +32,11 @@ func main() {
 		panic(err)
 	}
 
+	err = db.AutoMigrate(&model.User{})
+	if err != nil {
+		panic(err)
+	}
+
 	sqlDB, err := db.DB()
 	if err != nil {
 		panic(err)
@@ -38,12 +44,11 @@ func main() {
 	defer sqlDB.Close()
 
 	router := gin.Default()
-
 	r := repository.NewRepository(db)
 	us := service.NewUserService(r)
 
 	uh := handler.NewUserHandler(r, us)
-	router.GET("/users", uh.List)
 	router.POST("/users", uh.Create)
+
 	router.Run()
 }

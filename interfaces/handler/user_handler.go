@@ -1,14 +1,15 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/taisa831/go-ddd/application/input"
 	"github.com/taisa831/go-ddd/application/usecase"
+	"github.com/taisa831/go-ddd/domain/model"
 	"github.com/taisa831/go-ddd/domain/repository"
 	"github.com/taisa831/go-ddd/domain/service"
-	"github.com/taisa831/go-ddd/interfaces/response"
+	"github.com/taisa831/go-ddd/interfaces/request"
 )
 
 type UserHandler struct {
@@ -21,26 +22,21 @@ func NewUserHandler(r repository.Repository, us service.UserService) UserHandler
 	}
 }
 
-func (h *UserHandler) List(c *gin.Context) {
-	users, err := h.u.List()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-	res := response.NewUserListResponse(users)
-	c.JSON(http.StatusOK, res)
-}
-
 func (h *UserHandler) Create(c *gin.Context) {
-	in := input.UserCreateInput{}
-	if err := c.ShouldBindJSON(&in); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{})
+	req := request.UserCreateRequest{}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := h.u.Create(in)
+	err := h.u.Create(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		var reErr *model.UserExistsError
+		if errors.As(err, &reErr) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{})
