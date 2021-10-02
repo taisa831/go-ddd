@@ -2,44 +2,28 @@ package main
 
 import (
 	"log"
-	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/taisa831/go-ddd/domain/model"
+	"github.com/joho/godotenv"
 	"github.com/taisa831/go-ddd/infrastructure/repository"
 	"github.com/taisa831/go-ddd/infrastructure/service"
 	"github.com/taisa831/go-ddd/interfaces/handler"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func main() {
-	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags),
-		logger.Config{
-			SlowThreshold:             time.Second,
-			LogLevel:                  logger.Info,
-			IgnoreRecordNotFoundError: true,
-			Colorful:                  false,
-		},
-	)
-	db, err := gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{
-		Logger: newLogger,
-	})
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal(".env ファイルの読み込みに失敗しました。")
+    }
+	
+	db, err := repository.OpenDB()
 	if err != nil {
-		panic(err)
-	}
-
-	err = db.AutoMigrate(&model.User{})
-	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer sqlDB.Close()
 
@@ -49,6 +33,7 @@ func main() {
 
 	uh := handler.NewUserHandler(r, us)
 	router.POST("/users", uh.Create)
+	router.GET("/users", uh.List)
 
 	router.Run()
 }

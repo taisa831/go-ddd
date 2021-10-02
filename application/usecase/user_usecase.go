@@ -48,6 +48,10 @@ func (u *UserUsecase) Create(req request.UserCreateRequest) error {
 	return nil
 }
 
+func (u *UserUsecase) List() ([]*model.User, error) {
+	return u.r.FindUsers()
+}
+
 func (u *UserUsecase) GetUser() error {
 	fullName, err := model.NewFullName("taro", "suzuki")
 	if err != nil {

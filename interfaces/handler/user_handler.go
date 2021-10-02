@@ -22,6 +22,16 @@ func NewUserHandler(r repository.Repository, us service.UserService) UserHandler
 	}
 }
 
+func (h *UserHandler) List(c *gin.Context) {
+	users, err := h.u.List()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}
+
+
 func (h *UserHandler) Create(c *gin.Context) {
 	req := request.UserCreateRequest{}
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -33,7 +43,7 @@ func (h *UserHandler) Create(c *gin.Context) {
 	if err != nil {
 		var reErr *model.UserExistsError
 		if errors.As(err, &reErr) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

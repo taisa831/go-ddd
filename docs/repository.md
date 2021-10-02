@@ -13,7 +13,7 @@
 リポジトリはインターフェースで定義します。リポジトリの責務はあくまでもオブジェクトを永続化することです。
 
 ```go
-type repository interface {
+type Repository interface {
 	SaveUser(user *model.User) error
 	FindUserByName(name string) (*model.User, error)
 }
@@ -27,31 +27,24 @@ type repository interface {
 
 ## リポジトリに定義されるふるまい
 
-永続化のふるまいは永続化を行うオブジェクトを引数にとる
+永続化のふるまいは永続化を行うオブジェクトを引数にとります。
 
-良い例
+**良い例**
 
 ```go
-type repository interface {
+type Repository interface {
 	SaveUser(user *model.User) error
+	DeleteUser(user *model.User) error
 }
 ```
 
-悪い例
+**悪い例**
 
 ```go
-type repository interface {
+type Repository interface {
 	UpdateUserByName(id, name string) error
 	UpdateUserByEmail(id, email string) error
 	UpdateUserByAddress(id, address string) error
-}
-```
-
-破棄
-
-```go
-type repository interface {
-	DeleteUser(user *model.User) error
 }
 ```
 
