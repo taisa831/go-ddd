@@ -1,17 +1,31 @@
 # go-ddd
 
+## LIST
+
+```
+curl -X GET http://localhost:8081/users -H "content-type:application/json"
+```
+
+## GET
+
+```
+curl -X GET http://localhost:8081/users/ec51aa4e-08d8-42be-a9d6-9ec0af54c83d -H "content-type:application/json"
+```
+
 ## POST
 
 ```
 curl -X POST http://localhost:8080/users -H "content-type:application/json" -d '{ "name": "test" }'
 ```
 
+## PATCH
+
 ```
-show variables like 'max_connections';
+curl -X PATCH http://localhost:8081/users/ec51aa4e-08d8-42be-a9d6-9ec0af54c83d -H "content-type:application/json" -d '{ "name": "test3", "address": "address" }'
+```
 
-SELECT * FROM information_schema.PROCESSLIST;
+## DELETE
 
-SHOW GLOBAL STATUS LIKE 'connections';
-
-show status like 'Threads_connected';
+```
+curl -X DELETE http://localhost:8081/users/ec51aa4e-08d8-42be-a9d6-9ec0af54c83d -H "content-type:application/json"
 ```

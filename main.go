@@ -11,11 +11,11 @@ import (
 )
 
 func main() {
-    err := godotenv.Load()
-    if err != nil {
-        log.Fatal(".env ファイルの読み込みに失敗しました。")
-    }
-	
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(".env ファイルの読み込みに失敗しました。")
+	}
+
 	db, err := repository.OpenDB()
 	if err != nil {
 		log.Fatal(err)
@@ -34,6 +34,9 @@ func main() {
 	uh := handler.NewUserHandler(r, us)
 	router.POST("/users", uh.Create)
 	router.GET("/users", uh.List)
+	router.GET("/users/:userId", uh.Get)
+	router.PATCH("/users/:userId", uh.Update)
+	router.DELETE("/users/:userId", uh.Delete)
 
 	router.Run()
 }

@@ -52,70 +52,49 @@ func (u *UserUsecase) List() ([]*model.User, error) {
 	return u.r.FindUsers()
 }
 
-func (u *UserUsecase) GetUser() error {
-	fullName, err := model.NewFullName("taro", "suzuki")
+func (u *UserUsecase) Update(userID string, req request.UserUpdateRequest) error {
+	duplicated, err := u.us.Exists(req.Name)
 	if err != nil {
 		return err
 	}
-	fmt.Println(fullName.FirstName())
-	// 代入によって交換する
-	fullName, err = model.NewFullName("taro", "sato")
+
+	if duplicated {
+		return &model.UserExistsError{}
+	}
+
+	user, err := u.r.FindUserByID(userID)
 	if err != nil {
 		return err
 	}
-	fmt.Println(fullName.FirstName())
+
+	conf := model.UserUpdateConfig{
+		Name:    req.Name,
+		Address: req.Address,
+	}
+
+	if err := user.Update(conf); err != nil {
+		return err
+	}
+
+	if err := u.r.UpdateUser(user); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-// func (u *UserUsecase) Compare() (bool, error) {
-// 	fullNameA, err := model.NewFullName("taro", "suzuki")
-// 	if err != nil {
-// 		return false, err
-// 	}
-
-// 	fullNameB, err := model.NewFullName("taro", "suzuki")
-// 	if err != nil {
-// 		return false, err
-// 	}
-
-// 	ret := fullNameA == fullNameB
-// 	fmt.Println(ret)
-
-// 	userA, err := model.NewUser("taro")
-// 	if err != nil {
-// 		return false, err
-// 	}
-
-// 	userB, err := model.NewUser("taro")
-// 	if err != nil {
-// 		return false, err
-// 	}
-// 	return userA == userB, nil
-// }
-
-func (u *UserUsecase) Money() error {
-	myMoney := model.NewMoney(1000, "JPY")
-	allowance := model.NewMoney(3000, "JPY")
-	result, err := myMoney.Add(*allowance)
-	if err != nil {
-		return err
-	}
-	fmt.Println(result.Amount())
-
-	jpy := model.NewMoney(1000, "JPY")
-	usd := model.NewMoney(10, "USD")
-	result2, err := jpy.Add(*usd)
-	if err != nil {
-		return err
-	}
-	fmt.Println(result2.Amount())
-	return nil
+func (u *UserUsecase) Get(userID string) (*model.User, error) {
+	return u.r.FindUserByID(userID)
 }
 
-func (u *UserUsecase) MoneyPrimitive() error {
-	myMoney := 1000
-	allowance := 3000
-	result := myMoney + allowance
-	fmt.Println(result)
+func (u *UserUsecase) Delete(userID string) error {
+	user, err := u.r.FindUserByID(userID)
+	if err != nil {
+		return err
+	}
+
+	if err := u.r.DeleteUser(user); err != nil {
+		return err
+	}
 	return nil
 }

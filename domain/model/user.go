@@ -1,30 +1,50 @@
 package model
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
 )
 
 type User struct {
-	ID   string
-	Name string
+	ID      string
+	Name    string
+	Address string
 }
 
 type UserCreateConfig struct {
-	Name string
+	Name    string
+	Address string
+}
+
+type UserUpdateConfig struct {
+	Name    string
+	Address string
 }
 
 func NewUser(conf UserCreateConfig) (*User, error) {
 	u := &User{
-		ID: uuid.NewString(),
+		ID:      uuid.NewString(),
+		Address: conf.Address,
 	}
 	err := u.ChangeName(conf.Name)
 	if err != nil {
 		return nil, err
 	}
 	return u, nil
+}
+
+func (m *User) Update(conf UserUpdateConfig) error {
+	if conf.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+
+	if conf.Address == "" {
+		return fmt.Errorf("address is required")
+	}
+	m.Name = conf.Name
+	m.Address = conf.Address
+	return nil
 }
 
 func (m *User) ChangeName(name string) error {
@@ -35,42 +55,5 @@ func (m *User) ChangeName(name string) error {
 		return fmt.Errorf("ユーザ名は3文字以上です。%s", name)
 	}
 	m.Name = name
-	return nil
-}
-
-type FullName struct {
-	firstName string
-	lastName  string
-}
-
-func NewFullName(firstName, lastName string) (*FullName, error) {
-	if firstName == "" {
-		return nil, errors.New("firstName required")
-	}
-
-	if lastName == "" {
-		return nil, errors.New("firstName required")
-	}
-
-	return &FullName{
-		firstName: firstName,
-		lastName:  lastName,
-	}, nil
-}
-
-func (m *FullName) FirstName() string {
-	return m.firstName
-}
-
-func (m *FullName) LastName() string {
-	return m.lastName
-}
-
-func PrintFullName() error {
-	fullName, err := NewFullName("taro", "suzuki")
-	if err != nil {
-		return err
-	}
-	fmt.Println(fullName)
 	return nil
 }
