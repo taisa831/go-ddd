@@ -9,4 +9,8 @@ type Repository interface {
 	CreateUser(*model.User) error
 	UpdateUser(*model.User) error
 	DeleteUser(*model.User) error
+
+	SaveCircle(*model.Circle) error
+	FindCircleByID(*model.CircleID) (*model.Circle, error)
+	FindCircleByName(*model.CircleName) (*model.Circle, error)
 }
