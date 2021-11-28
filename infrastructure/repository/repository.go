@@ -6,7 +6,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/taisa831/go-ddd/domain/model"
 	"github.com/taisa831/go-ddd/domain/repository"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -27,8 +26,8 @@ func OpenDB() (*gorm.DB, error) {
 			Colorful:                  false,
 		},
 	)
-	
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", 
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		os.Getenv("USERNAME"), os.Getenv("PASSWORD"), os.Getenv("DBHOST"), os.Getenv("DBPORT"), os.Getenv("SCHEMA"))
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: newLogger,
@@ -45,10 +44,10 @@ func OpenDB() (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(100)
 	sqlDB.SetConnMaxLifetime(10 * time.Minute)
 
-	err = db.AutoMigrate(&model.User{})
-	if err != nil {
-		return nil, err
-	}
+	// err = db.AutoMigrate(&model.User{})
+	// if err != nil {
+	// 	return nil, err
+	// }
 	return db, nil
 }
 

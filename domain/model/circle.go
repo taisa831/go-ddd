@@ -1,6 +1,10 @@
 package model
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
 
 type CircleID struct {
 	Value string
@@ -36,26 +40,48 @@ func NewCircleName(val string) (*CircleName, error) {
 type Circle struct {
 	ID      CircleID
 	Name    CircleName
-	Owner   User
-	Members []*User
+	Owner   string
+	Members []*CircleMember
 }
 
 type CircleConfig struct {
-	ID      *CircleID
 	Name    *CircleName
 	Owner   *User
-	Members []*User
+	Members []*CircleMember
 }
 
 func NewCircle(conf CircleConfig) (*Circle, error) {
-	if conf.ID == nil || conf.Name == nil {
+	if conf.Name == nil {
 		return nil, errors.New("")
 	}
 
-	return &Circle{
-		ID:      *conf.ID,
+	uuid, err := NewCircleID(uuid.NewString())
+	if err != nil {
+		return nil, err
+	}
+
+	circle := &Circle{
+		ID:      *uuid,
 		Name:    *conf.Name,
-		Owner:   *conf.Owner,
+		Owner:   conf.Owner.ID,
 		Members: conf.Members,
-	}, nil
+	}
+
+	circleMember := NewCircleMember(conf.Owner, circle.ID)
+	circle.Members = append(circle.Members, circleMember)
+
+	return circle, nil
+}
+
+func (c *Circle) IsFull() bool {
+	return c.countMembers() >= 30
+}
+
+func (c *Circle) countMembers() int {
+	return len(c.Members) + 1
+}
+
+// デメテルの法則
+func (c *Circle) Join(user *User) {
+	c.Members = append(c.Members, NewCircleMember(user, c.ID))
 }

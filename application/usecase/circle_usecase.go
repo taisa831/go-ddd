@@ -70,13 +70,16 @@ func (u *CircleUsecase) Join(userID, circleID string) error {
 	}
 
 	if circle == nil {
-		return errors.New("")
+		return errors.New("circle is empty")
 	}
 
-	if len(circle.Members) >= 29 {
-		return errors.New("")
+	// if len(circle.Members) >= 29 {
+	if circle.IsFull() {
+		return errors.New("circle is full")
 	}
 
-	circle.Members = append(circle.Members, user)
+	// circle.Members = append(circle.Members, user)
+	circle.Join(user)
+
 	return u.r.SaveCircle(circle)
 }

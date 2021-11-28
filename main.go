@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/taisa831/go-ddd/infrastructure/factory"
 	"github.com/taisa831/go-ddd/infrastructure/repository"
 	"github.com/taisa831/go-ddd/infrastructure/service"
 	"github.com/taisa831/go-ddd/interfaces/handler"
@@ -37,6 +38,12 @@ func main() {
 	router.GET("/users/:userId", uh.Get)
 	router.PATCH("/users/:userId", uh.Update)
 	router.DELETE("/users/:userId", uh.Delete)
+
+	f := factory.NewCircleFactory()
+	cs := service.NewCircleService(r)
+	ch := handler.NewCircleHandler(r, f, cs)
+	router.POST("/circles", ch.Create)
+	router.POST("/circles/:circleId/join", ch.Join)
 
 	router.Run()
 }
